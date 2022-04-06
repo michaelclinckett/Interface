@@ -1,17 +1,215 @@
 #______IMPORT________#
 import tkinter as tk
-
-
-
+from tkinter import messagebox
+import math
+from colorama import Fore
+from data import _Ones, _Tens, _placeholders
 
 #______DEFINE_______#
+error =("not supporting yet")
+#___________________CONVERTING FUNCTION_____________________________#
+def main():
+  validation()
+
+def validation():
+  str = lb_input.get()
+  msg = ''
+  try:
+    if str[0] == ".":
+      str = "0"+str
+  except IndexError:
+    msg = "Please put in something"
+  try:                #try if input number
+    float(str)
+    if float(str) >= 0:      #Try if numeber bigger or equal 0
+      convert(str)
+    else:  
+      msg = "Please enter a positive number to convert"
+    
+    
+  except ValueError:
+    msg = "Please put in a VALID number"
+ 
+  if msg != '':
+    messagebox.showinfo('message', msg)
+
+#==Convert numeral to english words============================================#
+def convert(raw_num):
+  num1 = ""
+  num2 = ""
+  display = ''
+  try:
+    if "." in raw_num:
+      split_num = raw_num.split(".")
+      num1, num2 = split_num 
+      num1 = int(num1)
+      num2 = num2[0:3]
+      num2 = int(num2)/(10**len(num2))
+      #print(num2)
+      num2 = round(num2, 2)
+      #print(num2)
+      num2 = num2*100
+      #print(split_num)
+    
+      if num2 == 100:
+        num1 = num1 + 1
+        num2 = ""
+    else:
+      num1 = int(raw_num) 
+  except ValueError:
+    print(Fore.RED +"Please enter a number"+Fore.WHITE)
+
+
+  if len(str(num1)) > 126:
+    print(Fore.RED + "Sorry, this number is larger than our dictionary" +Fore.WHITE)
+
+  
+  if num2 == "":
+    if num1 < 100:    #checking to use 2_digit or 3_digit convert
+      two_output = two_d_convert(num1)
+      if two_output == "one":        
+        display = (two_output.capitalize(), "dollar")
+        display_calc_dollar(display)
+      else:
+        display = (two_output.capitalize(), "dollars")
+        display_calc_dollar(display)
+    elif num1 < 1000:
+      
+      display = (three_d_convert(num1).capitalize(), "dollars")
+      display_calc_dollar(display)
+    else:      #larger than 1000 input
+      output_str = more_convert(num1).capitalize(), "dollars"
+      display = ("".join(output_str))
+      display_calc_dollar(display)
+        
+  
+  
+  else:                      #decimal number loop
+
+    if num1 == 0:
+      display = (" ".join(cents_convert(num2)).capitalize())
+      display_calc_dollar(display)
+    elif num1 < 100:
+      two_output = two_d_convert(num1)
+      if two_output == "one":        
+        display = (((two_output).capitalize()),"dollar and", " ".join(cents_convert(num2)))
+        display_calc_dollar(" ".join(display))
+      else:
+        display = ((two_output).capitalize()),"dollars and", " ".join(cents_convert(num2))
+        display_calc_dollar(" ".join(display))
+
+    elif num1 < 1000:
+      
+      display = (three_d_convert(num1).capitalize()),"dollars","and", " ".join(cents_convert(num2))
+      display_calc_dollar(" ".join(display))
+    
+    else:
+      cents_output = "".join(((more_convert(num1).capitalize()),"dollars"))
+      display = (cents_output,"and", " ".join(cents_convert(num2)))
+      display_calc_dollar(" ".join(display))
+  
+
+  
+#==Two digit handling =========================================================#
+
+def two_d_convert(num):
+  if num < 20:                      #validate if number fit requirement for   dictionary 1
+
+    return (_Ones[num])    #This should able to convert number with in 1-19
+        
+  elif num < 100:
+      tens, ones = [(num//(10**i))%10 for i in range(math.ceil(math.log(num, 10))-1,  -1, -1)]
+     #Program from https://www.delftstack.com/howto/python/split-integer-into-digits-python/
+      ten_in_words = _Tens[tens]  #From dictionary find tens
+
+      if ones != 0:
+        one_in_words = _Ones[ones]  #From dictionary find ones
+        return " ".join((ten_in_words, one_in_words))  #prints the dollar amount
+        
+      else:
+        return (ten_in_words)
+  
+  else:
+    return " ".join((Fore.RED +"Not support yet"+Fore.WHITE))
+
+#==Convert decimal to cents ===================================================#    
+
+def cents_convert(cent):
+  if cent < 20:                      #validate if number fit requirement for   dictionary 1
+      if cent == 1:
+        return (_Ones[cent], "cent")    #Print one dollar
+      else: 
+        return (_Ones[cent], "cents")    #This should able to convert number with in 1-19
+  elif cent < 100:
+      ten_cents, single_cents = [(cent//(10**i))%10 for i in range(math.ceil(math.log(cent, 10))-1,  -1, -1)]
+     #Program from https://www.delftstack.com/howto/python/split-integer-into-digits-python/
+      ten_cents_in_words = _Tens[ten_cents]  #From dictionary find tens
+
+      if single_cents != 0:
+        single_cents_in_words = _Ones[single_cents]  #From dictionary find single_cents
+    
+        return (ten_cents_in_words, single_cents_in_words, "cents")  #prints the dollar amount
+      else:
+        return (ten_cents_in_words, "cents")
+  else:    #number greater than 100
+      return (Fore.RED +"There is an error"+Fore.WHITE)
+
+
+#==Three digits handling ======================================================#
+def three_d_convert(num):
+  raw_hundred = int(num/100)
+  raw_number = num - (raw_hundred*100)
+  if raw_hundred != 0:
+    if raw_number != 0:
+    
+      hundred = (_Ones[raw_hundred], "hundred")
+      return " ".join([" ".join(hundred),"and", two_d_convert(raw_number)])
+    else:
+      hundred = (_Ones[raw_hundred], "hundred")
+      return " ".join(hundred)
+  else:
+    return (two_d_convert(raw_number))
+
+    
+
+#==Handling more than 4 digits number =========================================#
+def more_convert(num):
+  two_digit = ""
+  string = ""
+  loop_time = 0
+  while num >= 100:
+    last_three_numbers = int(str(num)[-3:])                #Pull out the last three digits from input                          
+    num = num//1000                                        #Truncate the last three digits
+    
+    if loop_time != 0:      
+      last_three_digits = three_d_convert(last_three_numbers)+" "+_placeholders[loop_time]+" "
+    else:
+      last_three_digits = three_d_convert(last_three_numbers)+" "
+    if last_three_numbers == 0:
+      loop_time += 1
+    else:
+      string = last_three_digits + string
+      loop_time += 1
+
+  else:    
+    if num == 0:
+      return (string.capitalize())
+    else:
+      two_digit = two_d_convert(num)+" "+_placeholders[loop_time]+" "
+      outcome = two_digit + string
+      return(outcome.capitalize())
 
 
 
-#______FUNCTION_______#
 
+#______FUNCTION FOR TKINTER_______#
 
-
+def display_calc_dollar(display):
+    lb_output.config(state='normal')
+    #age calculated is insert into the text box after clearing th eprevious info in the textbox.
+    lb_output.delete('1.0', tk.END)
+    lb_output.insert(tk.END, display)
+    lb_output.config(state='disabled')
 
 
 
@@ -29,10 +227,36 @@ window.title("Number to Dollars converter")
 #_______LABEL________#
 lb_title = tk.Label(window, text="Number to dollars converter", font=("Arial", 20), fg="white", bg="#ed9c40")
 
-lb_input = tk.Label(window, text="Type in numbers here", font=("Arial", 10), fg="grey", bg="white")
+lb_input_lb = tk.Label(window, text="Type in number here:", font=("Arial", 12), fg="white", bg="#ed9c40")
 
-lb_output = tk.Label(window, text="", font=("Arial", 10), fg="grey", bg="white")
+lb_input = tk.Entry(window, width=30)
+
+lb_output = tk.Text(window, state='disabled', font=("Arial", 8), fg="grey", bg="white", width=60, height=5)
+
+btn_calculate_dollar = tk.Button(window,
+                              text="Convert",
+                              font=("Arial", 13),
+                              command=main)
+
+btn_exit = tk.Button(window,
+                     text="Exit Application",
+                     font=("Arial", 13),
+                     command=exit)
+
 
 #_______PLACING________#
 
-lb_title.place(x=60, y=20)
+lb_title.place(x=100, y=20)                        #Title placing
+
+lb_input_lb.place(x=50, y=90)                      #Lable of input placing
+
+lb_input.place(x=240, y=90)                        #input box placing
+
+btn_calculate_dollar.place(x=230, y= 120)          #button "Convert" placing
+
+lb_output.place(x=50, y= 250)                      #Output showing box placing
+
+btn_exit.place(x=100, y=200)                       #Exit button placing
+
+
+
