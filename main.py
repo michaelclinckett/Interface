@@ -58,61 +58,62 @@ def convert(raw_num):
     else:
       num1 = int(raw_num) 
   except ValueError:
-    print(Fore.RED +"Please enter a number"+Fore.WHITE)
+    messagebox.showinfo('message', "Please put in a valid input")
 
 
   if len(str(num1)) > 126:
-    print(Fore.RED + "Sorry, this number is larger than our dictionary" +Fore.WHITE)
-
+    messagebox.showinfo('message', "Sorry, this number is larger than our dictionary")
+    
+  else:
   
-  if num2 == "":
-    if num1 < 100:    #checking to use 2_digit or 3_digit convert
-      two_output = two_d_convert(num1)
-      if two_output == "one":        
-        display = (two_output.capitalize(), "dollar")
-        display_calc_dollar(display)
-      else:
-        display = (two_output.capitalize(), "dollars")
-        display_calc_dollar(display)
-    elif num1 < 1000:
+    if num2 == "":
+      if num1 < 100:    #checking to use 2_digit or 3_digit convert
+        two_output = two_d_convert(num1)
+        if two_output == "one":        
+          display = (two_output.capitalize(), "dollar")
+          display_calc_dollar(display)
+        else:
+          display = (two_output.capitalize(), "dollars")
+          display_calc_dollar(display)
+      elif num1 < 1000:
       
-      display = (three_d_convert(num1).capitalize(), "dollars")
-      display_calc_dollar(display)
-    else:      #larger than 1000 input
-      output_str = more_convert(num1).capitalize(), "dollars"
-      display = ("".join(output_str))
-      display_calc_dollar(display)
+        display = " ".join((three_d_convert(num1).capitalize(), "dollars"))
+        display_calc_dollar(display)
+      else:      #larger than 1000 input
+        output_str = more_convert(num1).capitalize(), "dollars"
+        display = ("".join(output_str))
+        display_calc_dollar(display)
         
   
   
-  else:                      #decimal number loop
+    else:                      #decimal number loop
 
-    if num1 == 0:
-      display = (" ".join(cents_convert(num2)).capitalize())
-      display_calc_dollar(display)
-    elif num1 < 100:
-      two_output = two_d_convert(num1)
-      if two_output == "one":        
-        raw_display = (((two_output).capitalize()),"dollar and", " ".join(cents_convert(num2)))
-        display = " ".join(raw_display)
+      if num1 == 0:
+        display = (" ".join(cents_convert(num2)).capitalize())
         display_calc_dollar(display)
-      else:
-        raw_display = ((two_output).capitalize()),"dollars and", " ".join(cents_convert(num2))
-        display = " ".join(raw_display)
-        display_calc_dollar(display)
+      elif num1 < 100:
+        two_output = two_d_convert(num1)
+        if two_output == "one":        
+          raw_display = (((two_output).capitalize()),"dollar and", " ".join(cents_convert(num2)))
+          display = " ".join(raw_display)
+          display_calc_dollar(display)
+        else:
+          raw_display = ((two_output).capitalize()),"dollars and", " ".join(cents_convert(num2))
+          display = " ".join(raw_display)
+          display_calc_dollar(display)
 
-    elif num1 < 1000:
+      elif num1 < 1000:
       
-      raw_display = (three_d_convert(num1).capitalize()),"dollars","and", " ".join(cents_convert(num2))
-      display = " ".join(raw_display)
-      display_calc_dollar(display)
+        raw_display = (three_d_convert(num1).capitalize()),"dollars","and", " ".join(cents_convert(num2))
+        display = " ".join(raw_display)
+        display_calc_dollar(display)
       
     
-    else:
-      cents_output = "".join(((more_convert(num1).capitalize()),"dollars"))
-      raw_display = (cents_output,"and", " ".join(cents_convert(num2)))
-      display = " ".join(raw_display)
-      display_calc_dollar(display)
+      else:
+        cents_output = "".join(((more_convert(num1).capitalize()),"dollars"))
+        raw_display = (cents_output,"and", " ".join(cents_convert(num2)))
+        display = " ".join(raw_display)
+        display_calc_dollar(display)
       
   
 
@@ -225,12 +226,14 @@ def export():
   text_file = open("output.txt", "w")
   try:
     n = text_file.write(str(display))
-    text_file.close()
+    if str(display) == '':
+      messagebox.showinfo('ERROR', "No text is available to export")
+    else:
+      
+      text_file.close()
   except NameError:
     messagebox.showinfo('ERROR', "No text is available to export")
   
-
-
 
 
 
@@ -245,9 +248,11 @@ window.title("Number to Dollars converter")
 #_______LABEL________#
 lb_title = tk.Label(window, text="Number to dollars converter", font=("Arial", 20), fg="white", bg="#ed9c40")
 
-lb_input_lb = tk.Label(window, text="Type in number here:", font=("Arial", 12), fg="white", bg="#ed9c40")
+lb_input_lb = tk.Label(window, text="Please type in a numeral number here to convert to english words:", font=("Arial", 12), fg="white", bg="#ed9c40")
 
-lb_input = tk.Entry(window, width=30)
+lb_limit = tk.Label(window, text="*The limit of convertion is 10^126 for this program", font=("Arial", 8), fg="red", bg="#ed9c40")
+
+lb_input = tk.Entry(window, width=47)
 
 lb_output = tk.Text(window, state='disabled', font=("Arial", 8), fg="grey", bg="white", width=60, height=5)
 
@@ -270,9 +275,11 @@ lb_export = tk.Button(window,
 
 lb_title.place(x=100, y=20)                        #Title placing
 
-lb_input_lb.place(x=50, y=90)                      #Lable of input placing
+lb_input_lb.place(x=30, y=60)                      #Lable of input placing
 
-lb_input.place(x=240, y=90)                        #input box placing
+lb_limit.place(x=150, y=90)                        #Place note for limit
+
+lb_input.place(x=70, y=110)                        #input box placing
 
 btn_calculate_dollar.place(x=230, y= 150)          #button "Convert" placing
 
