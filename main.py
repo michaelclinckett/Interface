@@ -35,6 +35,7 @@ def validation():
 
 #==Convert numeral to english words============================================#
 def convert(raw_num):
+  global display
   num1 = ""
   num2 = ""
   display = ''
@@ -92,21 +93,27 @@ def convert(raw_num):
     elif num1 < 100:
       two_output = two_d_convert(num1)
       if two_output == "one":        
-        display = (((two_output).capitalize()),"dollar and", " ".join(cents_convert(num2)))
-        display_calc_dollar(" ".join(display))
+        raw_display = (((two_output).capitalize()),"dollar and", " ".join(cents_convert(num2)))
+        display = " ".join(raw_display)
+        display_calc_dollar(display)
       else:
-        display = ((two_output).capitalize()),"dollars and", " ".join(cents_convert(num2))
-        display_calc_dollar(" ".join(display))
+        raw_display = ((two_output).capitalize()),"dollars and", " ".join(cents_convert(num2))
+        display = " ".join(raw_display)
+        display_calc_dollar(display)
 
     elif num1 < 1000:
       
-      display = (three_d_convert(num1).capitalize()),"dollars","and", " ".join(cents_convert(num2))
-      display_calc_dollar(" ".join(display))
+      raw_display = (three_d_convert(num1).capitalize()),"dollars","and", " ".join(cents_convert(num2))
+      display = " ".join(raw_display)
+      display_calc_dollar(display)
+      
     
     else:
       cents_output = "".join(((more_convert(num1).capitalize()),"dollars"))
-      display = (cents_output,"and", " ".join(cents_convert(num2)))
-      display_calc_dollar(" ".join(display))
+      raw_display = (cents_output,"and", " ".join(cents_convert(num2)))
+      display = " ".join(raw_display)
+      display_calc_dollar(display)
+      
   
 
   
@@ -157,16 +164,16 @@ def cents_convert(cent):
 
 #==Three digits handling ======================================================#
 def three_d_convert(num):
-  raw_hundred = int(num/100)
-  raw_number = num - (raw_hundred*100)
+  raw_hundred = int(num/100)                  #first number in three digit
+  raw_number = num - (raw_hundred*100)        #the last two digit
   if raw_hundred != 0:
     if raw_number != 0:
     
-      hundred = (_Ones[raw_hundred], "hundred")
-      return " ".join([" ".join(hundred),"and", two_d_convert(raw_number)])
+      hundred = " ".join((_Ones[raw_hundred], "hundred"))
+      return " ".join((hundred,"and", two_d_convert(raw_number)))
     else:
-      hundred = (_Ones[raw_hundred], "hundred")
-      return " ".join(hundred)
+      hundred = " ".join((_Ones[raw_hundred], "hundred"))
+      return hundred
   else:
     return (two_d_convert(raw_number))
 
@@ -212,6 +219,17 @@ def display_calc_dollar(display):
     lb_output.config(state='disabled')
 
 
+def export():
+
+
+  text_file = open("output.txt", "w")
+  try:
+    n = text_file.write(str(display))
+    text_file.close()
+  except NameError:
+    messagebox.showinfo('ERROR', "No text is available to export")
+  
+
 
 
 
@@ -243,6 +261,10 @@ btn_exit = tk.Button(window,
                      font=("Arial", 13),
                      command=exit)
 
+lb_export = tk.Button(window,
+                     text="Download",
+                     font=("Arial", 13),
+                     command=export)
 
 #_______PLACING________#
 
@@ -252,11 +274,11 @@ lb_input_lb.place(x=50, y=90)                      #Lable of input placing
 
 lb_input.place(x=240, y=90)                        #input box placing
 
-btn_calculate_dollar.place(x=230, y= 120)          #button "Convert" placing
+btn_calculate_dollar.place(x=230, y= 150)          #button "Convert" placing
 
-lb_output.place(x=50, y= 250)                      #Output showing box placing
+lb_output.place(x=70, y= 210)                      #Output showing box placing
 
-btn_exit.place(x=100, y=200)                       #Exit button placing
+btn_exit.place(x=400, y=300)                       #Exit button placing
 
-
+lb_export.place(x=225, y=300)
 
