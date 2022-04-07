@@ -9,25 +9,33 @@ from data import _Ones, _Tens, _placeholders
 error =("not supporting yet")
 #___________________CONVERTING FUNCTION_____________________________#
 def main():
+  lb_output.config(state="normal")
+  lb_output.delete('1.0', "end")
+  
   validation()
 
 def validation():
+  global display
   str = lb_input.get()
   msg = ''
   try:
     if str[0] == ".":
       str = "0"+str
   except IndexError:
+    display = ""
     msg = "Please put in something"
+    
   try:                #try if input number
     float(str)
     if float(str) >= 0:      #Try if numeber bigger or equal 0
       convert(str)
     else:  
+      display = ""
       msg = "Please enter a positive number to convert"
-    
+      
     
   except ValueError:
+    display = ""
     msg = "Please put in a VALID number"
  
   if msg != '':
@@ -73,7 +81,7 @@ def convert(raw_num):
           display = (two_output.capitalize(), "dollar")
           display_calc_dollar(display)
         else:
-          display = (two_output.capitalize(), "dollars")
+          display = " ".join((two_output.capitalize(), "dollars"))
           display_calc_dollar(display)
       elif num1 < 1000:
       
@@ -125,7 +133,7 @@ def two_d_convert(num):
 
     return (_Ones[num])    #This should able to convert number with in 1-19
         
-  elif num < 100:
+  else:
       tens, ones = [(num//(10**i))%10 for i in range(math.ceil(math.log(num, 10))-1,  -1, -1)]
      #Program from https://www.delftstack.com/howto/python/split-integer-into-digits-python/
       ten_in_words = _Tens[tens]  #From dictionary find tens
@@ -137,8 +145,7 @@ def two_d_convert(num):
       else:
         return (ten_in_words)
   
-  else:
-    return " ".join((Fore.RED +"Not support yet"+Fore.WHITE))
+
 
 #==Convert decimal to cents ===================================================#    
 
@@ -224,6 +231,7 @@ def export():
 
 
   text_file = open("output.txt", "w")
+  
   try:
     n = text_file.write(str(display))
     if str(display) == '':
@@ -244,7 +252,7 @@ window.geometry("600x350")
 window.config(bg="#ed9c40")
 window.resizable(width=False, height=False)
 window.title("Number to Dollars converter")
-
+ 
 #_______LABEL________#
 lb_title = tk.Label(window, text="Number to dollars converter", font=("Arial", 20), fg="white", bg="#ed9c40")
 
